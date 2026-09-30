@@ -2,47 +2,47 @@ import streamlit as st
 from datetime import datetime, date, time, timedelta
 
 # =========================================================
-# CONFIG & PAGE SETUP
+# 1. CONFIG & RESPONSIVE SETUP
 # =========================================================
 
 st.set_page_config(
-    page_title="نظام رفيقي الرعاية الصحية - Rafiqi System",
+    page_title="Rafiqi Healthcare System | نظام رفيقي",
     page_icon="🏥",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # =========================================================
-# DEPARTMENT THEMES (أقسام المستشفى)
+# 2. DEPARTMENT THEMES
 # =========================================================
 
 DEPARTMENT_THEMES = {
-    "العناية المركزة": {
+    "ICU": {
         "color": "#b91c1c",
         "light": "#fef2f2",
         "icon": "🔴"
     },
-    "الطوارئ": {
+    "Emergency": {
         "color": "#ea580c",
         "light": "#fff7ed",
         "icon": "🟠"
     },
-    "الراحة والعمليات": {
+    "Surgery": {
         "color": "#2563eb",
         "light": "#eff6ff",
         "icon": "🔵"
     },
-    "الباطنية": {
+    "Internal Medicine": {
         "color": "#0f766e",
         "light": "#f0fdfa",
         "icon": "🟢"
     },
-    "الأطفال": {
+    "Pediatrics": {
         "color": "#7c3aed",
         "light": "#f5f3ff",
         "icon": "🟣"
     },
-    "أمراض القلب": {
+    "Cardiology": {
         "color": "#be185d",
         "light": "#fdf2f8",
         "icon": "❤️"
@@ -50,27 +50,63 @@ DEPARTMENT_THEMES = {
 }
 
 # =========================================================
-# GLOBAL CSS (تنسيق واجهة عربية متكاملة RTL)
+# 3. GLOBAL RESPONSIVE CSS & RTL STYLING
 # =========================================================
 
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
-
-html, body, [class*="css"], div, span, p, h1, h2, h3, h4, button, input {
-    font-family: 'Cairo', sans-serif !important;
-    direction: rtl !important;
-    text-align: right !important;
+html, body, [class*="css"] {
+    font-family: 'Cairo', sans-serif;
+    direction: rtl;
+    text-align: right;
 }
 
 .stApp {
-    background: #f8fafc;
+    background: #f5f9fa;
 }
 
 .block-container {
-    padding-top: 1.5rem;
+    padding-top: 1rem;
     padding-bottom: 2rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+/* Welcome Screen Card */
+.welcome-card {
+    background: #ffffff;
+    border: 2px solid #0f766e;
+    border-radius: 20px;
+    padding: 30px;
+    margin: 20px 0;
+    box-shadow: 0 10px 30px rgba(15,118,110,.12);
+}
+
+.bismillah {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #0f766e;
+    margin-bottom: 20px;
+}
+
+.welcome-title {
+    color: #164e63;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.developer-tag {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    display: inline-block;
 }
 
 .main-header {
@@ -85,27 +121,32 @@ html, body, [class*="css"], div, span, p, h1, h2, h3, h4, button, input {
 .main-header h1 {
     margin: 0;
     font-size: 28px;
-    font-weight: 800;
 }
 
 .main-header p {
     margin: 5px 0 0 0;
-    opacity: .95;
-    font-size: 15px;
+    opacity: .9;
+}
+
+.metric-card {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid #dcebed;
+    box-shadow: 0 3px 15px rgba(0,0,0,.04);
 }
 
 .patient-card {
     background: white;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #dcebed;
     border-radius: 16px;
     padding: 18px;
     margin-bottom: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.02);
 }
 
 .patient-name {
     color: #164e63;
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 700;
 }
 
@@ -121,7 +162,6 @@ html, body, [class*="css"], div, span, p, h1, h2, h3, h4, button, input {
     padding: 13px;
     border-radius: 10px;
     margin-bottom: 8px;
-    font-weight: 600;
 }
 
 .alert-warning {
@@ -131,7 +171,6 @@ html, body, [class*="css"], div, span, p, h1, h2, h3, h4, button, input {
     padding: 13px;
     border-radius: 10px;
     margin-bottom: 8px;
-    font-weight: 600;
 }
 
 .permission-box {
@@ -144,58 +183,73 @@ html, body, [class*="css"], div, span, p, h1, h2, h3, h4, button, input {
 
 .section-title {
     color: #164e63;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
     margin-top: 18px;
     margin-bottom: 12px;
 }
 
-div[data-baseweb="radio"] {
-    direction: rtl !important;
+/* Mobile Responsiveness Improvements */
+@media (max-width: 768px) {
+    .block-container {
+        padding-left: 0.8rem !important;
+        padding-right: 0.8rem !important;
+    }
+    .welcome-card {
+        padding: 18px !important;
+    }
+    .bismillah {
+        font-size: 1.4rem !important;
+    }
+    .welcome-title {
+        font-size: 1.2rem !important;
+    }
+    .main-header h1 {
+        font-size: 22px !important;
+    }
 }
-
 </style>
 """, unsafe_allow_html=True)
 
 
 # =========================================================
-# DATABASE INITIALIZATION
+# 4. DATABASE INITIALIZATION
 # =========================================================
 
 if "db" not in st.session_state:
     st.session_state.db = {
         "departments": {
-            "العناية المركزة": [],
-            "الطوارئ": [],
-            "الراحة والعمليات": [],
-            "الباطنية": [],
-            "الأطفال": [],
-            "أمراض القلب": []
+            "ICU": [],
+            "Emergency": [],
+            "Surgery": [],
+            "Internal Medicine": [],
+            "Pediatrics": [],
+            "Cardiology": []
         },
         "users": [
             {
                 "id": 1,
-                "name": "سارة أحمد",
-                "role": "كادر طبي",
-                "department": "العناية المركزة"
+                "name": "Sarah Ahmed",
+                "role": "Medical Staff",
+                "department": "ICU"
             },
             {
                 "id": 2,
-                "name": "أحمد علي",
-                "role": "كادر طبي",
-                "department": "الطوارئ"
+                "name": "Ahmed Ali",
+                "role": "Medical Staff",
+                "department": "Emergency"
             },
             {
                 "id": 3,
-                "name": "نورة محمد",
-                "role": "كادر طبي",
-                "department": "الراحة والعمليات"
+                "name": "Nora Mohammed",
+                "role": "Medical Staff",
+                "department": "Surgery"
             },
             {
                 "id": 4,
-                "name": "المشرف العام",
-                "role": "مشرف",
-                "department": "الكل"
+                "name": "Admin Supervisor",
+                "role": "Supervisor",
+                "department": "All"
             }
         ],
         "shifts": [],
@@ -204,21 +258,21 @@ if "db" not in st.session_state:
         "audit_logs": []
     }
 
-    # العناية المركزة - مرضى افتراضيون
-    st.session_state.db["departments"]["العناية المركزة"] = [
+    # ICU PATIENTS
+    st.session_state.db["departments"]["ICU"] = [
         {
             "id": 1001,
             "room": "301",
-            "bed": "أ",
-            "name": "أحمد منصور",
+            "bed": "A",
+            "name": "Ahmed Mansour",
             "age": 56,
-            "gender": "ذكر",
-            "diagnosis": "متابعة ما بعد العملية الجراحية",
-            "status": "حرج",
-            "allergy": "البنسلين",
-            "isolation": "قياسي",
-            "fall_risk": "عالي",
-            "code_status": "إنعاش كامل (Full Code)",
+            "gender": "Male",
+            "diagnosis": "Post-operative care",
+            "status": "Critical",
+            "allergy": "Penicillin",
+            "isolation": "Standard",
+            "fall_risk": "High",
+            "code_status": "Full Code",
             "vitals": {
                 "BP": "92/58",
                 "HR": 112,
@@ -229,74 +283,74 @@ if "db" not in st.session_state:
             },
             "labs": [
                 {
-                    "test": "الهيموجلوبين (Hb)",
+                    "test": "Hemoglobin",
                     "result": "9.8",
                     "unit": "g/dL",
                     "reference": "13-17",
-                    "flag": "منخفض"
+                    "flag": "Low"
                 },
                 {
-                    "test": "خلايا الدم البيضاء (WBC)",
+                    "test": "WBC",
                     "result": "15.2",
                     "unit": "10³/µL",
                     "reference": "4-11",
-                    "flag": "مرتفع"
+                    "flag": "High"
                 },
                 {
-                    "test": "الكرياتينين (Creatinine)",
+                    "test": "Creatinine",
                     "result": "1.1",
                     "unit": "mg/dL",
                     "reference": "0.7-1.3",
-                    "flag": "طبيعي"
+                    "flag": "Normal"
                 }
             ],
             "medications": [
                 {
-                    "name": "سيفتركيسون (Ceftriaxone)",
-                    "dose": "1 جرام",
-                    "route": "وريدي",
+                    "name": "Ceftriaxone",
+                    "dose": "1 g",
+                    "route": "IV",
                     "time": "20:00",
-                    "status": "معلق"
+                    "status": "Pending"
                 },
                 {
-                    "name": "باراسيتامول (Paracetamol)",
-                    "dose": "1 جرام",
-                    "route": "وريدي",
+                    "name": "Paracetamol",
+                    "dose": "1 g",
+                    "route": "IV",
                     "time": "22:00",
-                    "status": "معلق"
+                    "status": "Pending"
                 }
             ],
             "notes": [
                 {
                     "time": "08:30",
-                    "author": "سارة أحمد",
-                    "text": "يعاني المريض من آلام متوسطة وتم تقديم المسكن حسب الخطة."
+                    "author": "Sarah Ahmed",
+                    "text": "Patient complained of moderate pain."
                 }
             ],
             "care_plan": [
-                "مراقبة العلامات الحيوية كل ساعتين",
-                "متابعة الجرح الجراحي وتغيير الضماد",
-                "تقييم مستوى الألم بانتظام",
-                "متابعة السوائل الوريدية"
+                "Monitor vital signs every 2 hours",
+                "Monitor surgical wound",
+                "Assess pain",
+                "Monitor IV therapy"
             ]
         }
     ]
 
-    # الطوارئ - مرضى افتراضيون
-    st.session_state.db["departments"]["الطوارئ"] = [
+    # EMERGENCY PATIENTS
+    st.session_state.db["departments"]["Emergency"] = [
         {
             "id": 2001,
             "room": "ER-04",
-            "bed": "أ",
-            "name": "خالد حسن",
+            "bed": "A",
+            "name": "Khalid Hassan",
             "age": 45,
-            "gender": "ذكر",
-            "diagnosis": "آلام حادة في الصدر",
-            "status": "ملاحظة",
-            "allergy": "لا يوجد",
-            "isolation": "قياسي",
-            "fall_risk": "متوسط",
-            "code_status": "إنعاش كامل (Full Code)",
+            "gender": "Male",
+            "diagnosis": "Chest pain",
+            "status": "Warning",
+            "allergy": "None",
+            "isolation": "Standard",
+            "fall_risk": "Medium",
+            "code_status": "Full Code",
             "vitals": {
                 "BP": "145/88",
                 "HR": 98,
@@ -307,644 +361,653 @@ if "db" not in st.session_state:
             },
             "labs": [
                 {
-                    "test": "إنزيم التروپونين (Troponin)",
+                    "test": "Troponin",
                     "result": "0.04",
                     "unit": "ng/mL",
                     "reference": "<0.04",
-                    "flag": "طبيعي"
+                    "flag": "Normal"
+                },
+                {
+                    "test": "WBC",
+                    "result": "11.8",
+                    "unit": "10³/µL",
+                    "reference": "4-11",
+                    "flag": "High"
                 }
             ],
             "medications": [
                 {
-                    "name": "أسبرين (Aspirin)",
-                    "dose": "81 ملجم",
-                    "route": "فموي",
+                    "name": "Aspirin",
+                    "dose": "81 mg",
+                    "route": "PO",
                     "time": "09:00",
-                    "status": "معلق"
+                    "status": "Pending"
                 }
             ],
             "notes": [],
             "care_plan": [
-                "مراقبة آلام الصدر وعمل تخطيط قلب جديد عند الحاجة",
-                "متابعة العلامات الحيوية",
-                "متابعة تعليمات الطبيب المعالج"
+                "Monitor chest pain",
+                "Monitor vital signs",
+                "Follow physician orders"
             ]
         }
     ]
 
 
 # =========================================================
-# HEADER & ROLE SELECTION
+# 5. WELCOME SCREEN STATE
 # =========================================================
 
-st.markdown("""
-<div class="main-header">
-    <h1>🏥 نظام رفيقي للرعاية الصحية (Rafiqi System)</h1>
-    <p>النظام الموحد إدارة التمريض، مناوبات الكادر الطبي، ورعاية المرضى</p>
-</div>
-""", unsafe_allow_html=True)
-
-user_role = st.radio(
-    "اختر البوابة للوصول:",
-    [
-        "👨‍💼 بوابة المشرف",
-        "👩‍⚕️ بوابة الكادر الطبي",
-        "🧑‍🦽 بوابة المريض / المرافِق"
-    ],
-    horizontal=True
-)
-
-if user_role == "👨‍💼 بوابة المشرف":
-    current_role = "مشرف"
-elif user_role == "👩‍⚕️ بوابة الكادر الطبي":
-    current_role = "كادر طبي"
-else:
-    current_role = "مريض"
-
-
-# =========================================================
-# SIDEBAR NAVIGATION
-# =========================================================
-
-st.sidebar.title("🏥 نظام رفيقي")
-st.sidebar.caption(f"الدخول الحالي: **{current_role}**")
-
-
-# =========================================================
-# 1. SUPERVISOR PORTAL (بوابة المشرف)
-# =========================================================
-
-if current_role == "مشرف":
-    st.sidebar.subheader("القائمة الرئيسية للمشرف")
-
-    supervisor_page = st.sidebar.radio(
-        "إدارة النظام",
-        [
-            "📊 نظرة عامة",
-            "🔄 تسليم المناوبات (Handover)",
-            "🚪 الطلبات والإستئذانات",
-            "👥 إدارة الطاقم الطبي",
-            "🏥 حالة الأقسام",
-            "📜 سجل العمليات (Audit Log)"
-        ]
-    )
-
-    # 📊 نظرة عامة
-    if supervisor_page == "📊 نظرة عامة":
-        st.markdown('<div class="section-title">👨‍💼 لوحة تحكم المشرف العام</div>', unsafe_allow_html=True)
-
-        total_patients = sum(len(p) for p in st.session_state.db["departments"].values())
-        active_shifts = len([s for s in st.session_state.db["shifts"] if s["status"] == "نشط"])
-        pending_permissions = len([p for p in st.session_state.db["permissions"] if p["status"] == "قيد الانتظار"])
-
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("إجمالي المرضى المنومين", total_patients)
-        c2.metric("المناوبات النشطة حالياً", active_shifts)
-        c3.metric("طلبات الاستئذان المعلقة", pending_permissions)
-        c4.metric("عدد الأقسام الطبية", len(st.session_state.db["departments"]))
-
-        st.markdown('<div class="section-title">🔄 حالة المناوبات الحالية</div>', unsafe_allow_html=True)
-
-        if not st.session_state.db["shifts"]:
-            st.info("لا توجد مناوبات مسجلة حالياً.")
-        else:
-            for shift in reversed(st.session_state.db["shifts"]):
-                if shift["status"] == "نشط":
-                    st.success(f'🟢 الموظف: {shift["staff"]} — القسم: {shift["department"]} — بدء المناوبة: {shift["start"]}')
-                else:
-                    st.info(f'⚪ الموظف: {shift["staff"]} — القسم: {shift["department"]} — مكتملة')
-
-    # 🔄 تسليم المناوبات
-    elif supervisor_page == "🔄 تسليم المناوبات (Handover)":
-        st.markdown('<div class="section-title">🔄 متابعة تسليم واستلام المناوبات بين الكادر</div>', unsafe_allow_html=True)
-
-        if not st.session_state.db["handovers"]:
-            st.info("لا توجد سجلات تسليم مناوبات حتى الآن.")
-        else:
-            for h in reversed(st.session_state.db["handovers"]):
-                with st.expander(f'{h["department"]} — من: {h["from_staff"]} ⬅️ إلى: {h["to_staff"]} ({h["date"]})'):
-                    st.write(f'**المريض / التغطية:** {h["patient"]}')
-                    st.write(f'**ملاحظات التسليم:** {h["notes"]}')
-                    st.write(f'**المهام المعلقة/المطلوبة:** {h["pending_tasks"]}')
-
-    # 🚪 الاستئذانات
-    elif supervisor_page == "🚪 الطلبات والإستئذانات":
-        st.markdown('<div class="section-title">🚪 إدارة طلبات الاستئذان والمغادرة</div>', unsafe_allow_html=True)
-
-        requests = st.session_state.db["permissions"]
-
-        if not requests:
-            st.info("لا توجد طلبات استئذان مقدمة.")
-
-        for i, request in enumerate(requests):
-            st.markdown(
-                f"""
-                <div class="permission-box">
-                    <b>الموظف: {request["staff"]}</b><br>
-                    القسم: {request["department"]}<br>
-                    الفترة الزمنية: من {request["from"]} إلى {request["to"]}<br>
-                    السبب: {request["reason"]}<br>
-                    الحالة الحالية: <b>{request["status"]}</b>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-            if request["status"] == "قيد الانتظار":
-                a, b = st.columns(2)
-                with a:
-                    if st.button("✅ قبول الطلب", key=f"approve_{i}"):
-                        request["status"] = "مقبول"
-                        st.session_state.db["audit_logs"].append(
-                            f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — وافق المشرف على استئذان الموظف {request["staff"]}'
-                        )
-                        st.rerun()
-                with b:
-                    if st.button("❌ رفض الطلب", key=f"reject_{i}"):
-                        request["status"] = "مرفوض"
-                        st.session_state.db["audit_logs"].append(
-                            f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — رفض المشرف استئذان الموظف {request["staff"]}'
-                        )
-                        st.rerun()
-
-    # 👥 الطاقم الطبي
-    elif supervisor_page == "👥 إدارة الطاقم الطبي":
-        st.markdown('<div class="section-title">👥 قائمة الكادر الطبي المسجل</div>', unsafe_allow_html=True)
-
-        for user in st.session_state.db["users"]:
-            st.markdown(
-                f"""
-                <div class="patient-card">
-                    <div class="patient-name">👤 {user["name"]}</div>
-                    <div class="small-text">
-                        الدور: {user["role"]}<br>
-                        القسم المخصص: {user["department"]}
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        st.subheader("➕ إضافة موظف جديد")
-
-        with st.form("add_staff_form"):
-            name = st.text_input("اسم الموظف")
-            role = st.selectbox("الدور الوظيفي", ["كادر طبي", "مشرف"])
-            department = st.selectbox(
-                "القسم",
-                list(st.session_state.db["departments"].keys()) + ["الكل"]
-            )
-            submit = st.form_submit_button("إضافة الموظف")
-
-            if submit and name.strip():
-                new_id = len(st.session_state.db["users"]) + 1
-                st.session_state.db["users"].append({
-                    "id": new_id,
-                    "name": name,
-                    "role": role,
-                    "department": department
-                })
-                st.success(f"تمت إضافة {name} بنجاح.")
-                st.rerun()
-
-    # 🏥 الأقسام
-    elif supervisor_page == "🏥 حالة الأقسام":
-        st.markdown('<div class="section-title">🏥 النظرة العامة على الأقسام والمنومين</div>', unsafe_allow_html=True)
-
-        for dept_name, patients_list in st.session_state.db["departments"].items():
-            theme = DEPARTMENT_THEMES[dept_name]
-            st.markdown(
-                f"""
-                <div style="
-                    background:{theme["light"]};
-                    border-right:6px solid {theme["color"]};
-                    padding:16px;
-                    border-radius:12px;
-                    margin-bottom:10px;
-                ">
-                    <b style="font-size:18px;">{theme["icon"]} قسم {dept_name}</b><br>
-                    عدد المرضى المنومين حالياً: <b>{len(patients_list)}</b>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-    # 📜 سجل العمليات
-    elif supervisor_page == "📜 سجل العمليات (Audit Log)":
-        st.markdown('<div class="section-title">📜 سجل أحداث وتغييرات النظام (Audit Trail)</div>', unsafe_allow_html=True)
-
-        logs = st.session_state.db["audit_logs"]
-        if not logs:
-            st.info("لا توجد أحداث مسجلة حتى الآن.")
-        else:
-            for log in reversed(logs):
-                st.code(log, language="text")
-
-
-# =========================================================
-# 2. MEDICAL STAFF PORTAL (بوابة الكادر الطبي)
-# =========================================================
-
-elif current_role == "كادر طبي":
-
-    # اختيار الموظف الحالي المباشر
-    staff_names = [u["name"] for u in st.session_state.db["users"] if u["role"] == "كادر طبي"]
-    current_staff_name = st.sidebar.selectbox("الموظف الحالي:", staff_names, index=0)
-    
-    staff = next((u for u in st.session_state.db["users"] if u["name"] == current_staff_name), st.session_state.db["users"][0])
-
-    department = st.sidebar.selectbox(
-        "🏥 القسم الطبي الحالي",
-        list(st.session_state.db["departments"].keys()),
-        index=0
-    )
-
-    theme = DEPARTMENT_THEMES[department]
-
-    st.markdown(
-        f"""
-        <div style="
-            background:{theme["light"]};
-            border-right:7px solid {theme["color"]};
-            padding:20px;
-            border-radius:15px;
-            margin-bottom:20px;
-        ">
-            <h2 style="color:{theme["color"]}; margin:0;">
-                {theme["icon"]} قسم {department}
-            </h2>
-            <span>بوابة الممارسة الطبية والتمريض</span>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    staff_menu = st.sidebar.radio(
-        "قائمة الخدمات",
-        [
-            "📊 لوحة متابعة القسم",
-            "👥 سجل وقوائم المرضى",
-            "➕ تسجيل مريض جديد",
-            "🔄 تسليم واستلام المناوبة",
-            "🚪 طلب استئذان",
-            "🕐 مناوبتي وتسجيل الدخول"
-        ]
-    )
-
-    patients = st.session_state.db["departments"][department]
-
-    # 📊 لوحة متابعة القسم
-    if staff_menu == "📊 لوحة متابعة القسم":
-        total = len(patients)
-        critical = len([p for p in patients if p["status"] == "حرج"])
-        warning = len([p for p in patients if p["status"] == "ملاحظة"])
-        stable = len([p for p in patients if p["status"] == "مستقر"])
-
-        a, b, c, d = st.columns(4)
-        a.metric("إجمالي المرضى", total)
-        b.metric("🔴 حالات حرجة", critical)
-        c.metric("🟠 تحت الملاحظة", warning)
-        d.metric("🟢 حالات مستقرة", stable)
-
-        st.markdown('<div class="section-title">🚨 التنبيهات الفورية والعلامات الحرجة</div>', unsafe_allow_html=True)
-
-        alerts = False
-        for p in patients:
-            if p["vitals"]["SpO2"] < 92:
-                alerts = True
-                st.markdown(
-                    f"""
-                    <div class="alert-danger">
-                        ⚠️ <b>{p["name"]}</b> (الغرفة {p["room"]}) — انخفاض تشبع الأكسجين: SpO₂ {p["vitals"]["SpO2"]}%
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-            if p["vitals"]["Temp"] >= 38.0:
-                alerts = True
-                st.markdown(
-                    f"""
-                    <div class="alert-warning">
-                        🌡️ <b>{p["name"]}</b> (الغرفة {p["room"]}) — ارتفاع درجة الحرارة: {p["vitals"]["Temp"]}°C
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-        if not alerts:
-            st.success("✅ جميع العلامات الحيوية للمرضى ضمن الحدود المقبولة ولا توجد تنبيهات حرجة.")
-
-    # 👥 سجل وقوائم المرضى
-    elif staff_menu == "👥 سجل وقوائم المرضى":
-        st.markdown('<div class="section-title">👥 سجل المرضى المنومين والتفاصيل الطبية</div>', unsafe_allow_html=True)
-
-        search = st.text_input("🔎 بحث عن مريض", placeholder="ادخل اسم المريض أو رقم الغرفة...")
-
-        if not patients:
-            st.info(f"لا يوجد مرضى منومين حالياً في قسم {department}.")
-
-        for p_idx, p in enumerate(patients):
-            if search and search.lower() not in (p["name"] + str(p["room"])).lower():
-                continue
-
-            with st.expander(f'👤 {p["name"]} — الغرفة {p["room"]} / السرير {p["bed"]} — (الحالة: {p["status"]})'):
-                st.write(f'**التشخيص الطبي:** {p["diagnosis"]}')
-                st.write(f'**الحساسية:** {p["allergy"]}')
-                st.write(f'**نوع العزل:** {p["isolation"]}')
-                st.write(f'**خطورة السقوط:** {p["fall_risk"]}')
-                st.write(f'**رمز الإنعاش:** {p["code_status"]}')
-
-                tabs = st.tabs([
-                    "❤️ العلامات الحيوية",
-                    "🧪 الفحوصات والتحاليل",
-                    "💊 الأدوية وعلاجات المريض",
-                    "📝 الملاحظات التمريضية",
-                    "🩺 الخطة العلاجية",
-                    "🔄 تسليم حالة المريض"
-                ])
-
-                # 1. العلامات الحيوية
-                with tabs[0]:
-                    v = p["vitals"]
-                    a, b, c, d, e, f = st.columns(6)
-                    a.metric("ضغط الدم", v["BP"])
-                    b.metric("نبض القلب", v["HR"])
-                    c.metric("التنفس", v["RR"])
-                    d.metric("الحرارة", f'{v["Temp"]}°C')
-                    e.metric("الأكسجين", f'{v["SpO2"]}%')
-                    f.metric("الألم", f'{v["Pain"]}/10')
-
-                    st.markdown("---")
-                    st.write("**تحديث العلامات الحيوية**")
-                    with st.form(f"update_vitals_{p['id']}"):
-                        v_bp = st.text_input("ضغط الدم (BP)", value=v["BP"])
-                        v_hr = st.number_input("معدل النبض (HR)", value=int(v["HR"]))
-                        v_rr = st.number_input("معدل التنفس (RR)", value=int(v["RR"]))
-                        v_temp = st.number_input("الحرارة (Temp °C)", value=float(v["Temp"]), step=0.1)
-                        v_spo2 = st.number_input("تشبع الأكسجين (SpO2 %)", value=int(v["SpO2"]))
-                        v_pain = st.number_input("مستوى الألم (0-10)", value=int(v["Pain"]), min_value=0, max_value=10)
-
-                        if st.form_submit_button("حفظ التحديث"):
-                            p["vitals"] = {
-                                "BP": v_bp, "HR": v_hr, "RR": v_rr,
-                                "Temp": v_temp, "SpO2": v_spo2, "Pain": v_pain
-                            }
-                            st.session_state.db["audit_logs"].append(
-                                f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — قام {staff["name"]} بتحديث علامات المريض {p["name"]}'
-                            )
-                            st.success("تم تحديث العلامات الحيوية بنجاح!")
-                            st.rerun()
-
-                # 2. الفحوصات
-                with tabs[1]:
-                    for lab in p["labs"]:
-                        if lab["flag"] == "مرتفع":
-                            st.error(f'🔴 {lab["test"]}: {lab["result"]} {lab["unit"]} (مرتفع)')
-                        elif lab["flag"] == "منخفض":
-                            st.warning(f'🟡 {lab["test"]}: {lab["result"]} {lab["unit"]} (منخفض)')
-                        else:
-                            st.success(f'🟢 {lab["test"]}: {lab["result"]} {lab["unit"]} (طبيعي)')
-                        st.caption(f'المعدل الطبيعي: {lab["reference"]}')
-
-                # 3. الأدوية
-                with tabs[2]:
-                    for med_idx, med in enumerate(p["medications"]):
-                        st.markdown(f"**{med['name']}** — الجرعة: {med['dose']} • الطريق: {med['route']} • الوقت: {med['time']}")
-                        
-                        status_options = ["معلق", "تم الإعطاء", "مرفوض من المريض", "متجاوز"]
-                        current_index = status_options.index(med["status"]) if med["status"] in status_options else 0
-                        
-                        current_status = st.selectbox(
-                            "حالة إعطاء الدواء",
-                            status_options,
-                            index=current_index,
-                            key=f"med_status_{p['id']}_{med_idx}"
-                        )
-                        if current_status != med["status"]:
-                            med["status"] = current_status
-                            st.session_state.db["audit_logs"].append(
-                                f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — الموظف {staff["name"]} حدّث حالة دواء {med["name"]} للمريض {p["name"]} إلى: {current_status}'
-                            )
-                            st.rerun()
-
-                # 4. الملاحظات التمريضية
-                with tabs[3]:
-                    for note in p["notes"]:
-                        st.write(f"⏱️ **{note['time']}** ({note['author']}): {note['text']}")
-
-                    with st.form(f"add_note_{p['id']}"):
-                        new_note_text = st.text_area("إضافة ملاحظة تمريضية جديدة")
-                        if st.form_submit_button("حفظ الملاحظة") and new_note_text.strip():
-                            p["notes"].append({
-                                "time": datetime.now().strftime("%H:%M"),
-                                "author": staff["name"],
-                                "text": new_note_text
-                            })
-                            st.success("تم حفظ الملاحظة.")
-                            st.rerun()
-
-                # 5. الخطة العلاجية
-                with tabs[4]:
-                    for item in p["care_plan"]:
-                        st.markdown(f"- {item}")
-
-                # 6. التسليم
-                with tabs[5]:
-                    with st.form(f"patient_handover_{p['id']}"):
-                        to_staff = st.selectbox("تسليم الحالة إلى:", [u["name"] for u in st.session_state.db["users"] if u["name"] != staff["name"]], key=f"to_staff_{p['id']}")
-                        handover_notes = st.text_area("ملاحظات وتسليم الحالة", key=f"h_notes_{p['id']}")
-                        pending_tasks = st.text_area("المهام المطلوبة من المناوب القادم", key=f"p_tasks_{p['id']}")
-
-                        if st.form_submit_button("إرسال التسليم"):
-                            st.session_state.db["handovers"].append({
-                                "department": department,
-                                "from_staff": staff["name"],
-                                "to_staff": to_staff,
-                                "patient": p["name"],
-                                "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
-                                "notes": handover_notes,
-                                "pending_tasks": pending_tasks
-                            })
-                            st.success("تم تسليم الحالة بنجاح!")
-                            st.rerun()
-
-    # ➕ تسجيل مريض جديد
-    elif staff_menu == "➕ تسجيل مريض جديد":
-        st.markdown('<div class="section-title">➕ تسجيل وإدخال مريض جديد للقسم</div>', unsafe_allow_html=True)
-
-        with st.form("add_patient_form"):
-            name = st.text_input("اسم المريض بالكامل")
-            age = st.number_input("العمر", min_value=0, max_value=120, value=30)
-            gender = st.selectbox("الجنس", ["ذكر", "أنثى"])
-            room = st.text_input("رقم الغرفة")
-            bed = st.text_input("رقم/رمز السرير", value="أ")
-            diagnosis = st.text_input("التشخيص المبدئي")
-            status = st.selectbox("حالة المريض", ["مستقر", "ملاحظة", "حرج"])
-            allergy = st.text_input("الحساسية والأدوية الممنوعة", value="لا يوجد")
-            isolation = st.selectbox("نوع العزل", ["قياسي", "تلامسي", "رذاذ", "عزل هوائي"])
-            fall_risk = st.selectbox("خطورة السقوط", ["منخفض", "متوسط", "عالي"])
-
-            if st.form_submit_button("تسجيل المريض"):
-                if name.strip() and room.strip():
-                    new_patient = {
-                        "id": 1000 + len(patients) + 1,
-                        "room": room,
-                        "bed": bed,
-                        "name": name,
-                        "age": age,
-                        "gender": gender,
-                        "diagnosis": diagnosis,
-                        "status": status,
-                        "allergy": allergy,
-                        "isolation": isolation,
-                        "fall_risk": fall_risk,
-                        "code_status": "إنعاش كامل (Full Code)",
-                        "vitals": {"BP": "120/80", "HR": 75, "RR": 16, "Temp": 37.0, "SpO2": 98, "Pain": 0},
-                        "labs": [],
-                        "medications": [],
-                        "notes": [],
-                        "care_plan": ["متابعة العلامات الحيوية حسب بروتوكول القسم"]
-                    }
-                    patients.append(new_patient)
-                    st.session_state.db["audit_logs"].append(
-                        f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — أضاف الموظف {staff["name"]} المريض {name} لقسم {department}'
-                    )
-                    st.success(f"تم تسجيل المريض {name} بنجاح!")
-                    st.rerun()
-                else:
-                    st.error("يرجى تعبئة الحقول الأساسية (اسم المريض ورقم الغرفة).")
-
-    # 🔄 تسليم المناوبة العام
-    elif staff_menu == "🔄 تسليم واستلام المناوبة":
-        st.markdown('<div class="section-title">🔄 نموذج تسليم واستلام المناوبات للقسم</div>', unsafe_allow_html=True)
-
-        with st.form("general_handover_form"):
-            to_staff = st.selectbox("تسليم إلى الزميل/الزميلة:", [u["name"] for u in st.session_state.db["users"] if u["name"] != staff["name"]])
-            patient_name = st.selectbox("المريض المعني (أو اختيار كافة المرضى):", ["جميع مرضى القسم"] + [p["name"] for p in patients])
-            notes = st.text_area("ملخص المناوبة والأحداث الهامة")
-            pending_tasks = st.text_area("المهام المتبقية والمعلقة")
-
-            if st.form_submit_button("اعتماد وإرسال التسليم"):
-                st.session_state.db["handovers"].append({
-                    "department": department,
-                    "from_staff": staff["name"],
-                    "to_staff": to_staff,
-                    "patient": patient_name,
-                    "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
-                    "notes": notes,
-                    "pending_tasks": pending_tasks
-                })
-                st.success("تم تقديم نموذج تسليم المناوبة بنجاح.")
-                st.rerun()
-
-    # 🚪 طلب استئذان
-    elif staff_menu == "🚪 طلب استئذان":
-        st.markdown('<div class="section-title">🚪 تقديم طلب استئذان / مغادرة أثناء المناوبة</div>', unsafe_allow_html=True)
-
-        with st.form("permission_form"):
-            time_from = st.time_input("من الساعة", value=time(12, 0))
-            time_to = st.time_input("إلى الساعة", value=time(13, 0))
-            reason = st.text_area("سبب الاستئذان")
-
-            if st.form_submit_button("إرسال الطلب للمشرف"):
-                st.session_state.db["permissions"].append({
-                    "staff": staff["name"],
-                    "department": department,
-                    "from": time_from.strftime("%H:%M"),
-                    "to": time_to.strftime("%H:%M"),
-                    "reason": reason,
-                    "status": "قيد الانتظار"
-                })
-                st.session_state.db["audit_logs"].append(
-                    f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — قدم الموظف {staff["name"]} طلب استئذان'
-                )
-                st.success("تم إرسال الطلب بنجاح إلى المشرف لمراجعته.")
-                st.rerun()
-
-    # 🕐 تسجيل المناوبة
-    elif staff_menu == "🕐 مناوبتي وتسجيل الدخول":
-        st.markdown('<div class="section-title">🕐 إدارة و تسجيل دخول/خروج المناوبة الحالية</div>', unsafe_allow_html=True)
-
-        active_shift = next((s for s in st.session_state.db["shifts"] if s["staff"] == staff["name"] and s["status"] == "نشط"), None)
-
-        if active_shift:
-            st.success(f"أنت في مناوبة نشطة حالياً بدأت عند الساعة: **{active_shift['start']}**")
-            if st.button("🔴 إنهاء المناوبة وتسجيل الخروج"):
-                active_shift["status"] = "مكتملة"
-                active_shift["end"] = datetime.now().strftime("%H:%M")
-                st.session_state.db["audit_logs"].append(
-                    f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — أنهى {staff["name"]} مناوبته'
-                )
-                st.success("تم تسجيل الخروج من المناوبة بنجاح.")
-                st.rerun()
-        else:
-            st.info("لا توجد مناوبة نشطة باسمك حالياً.")
-            if st.button("🟢 بدء المناوبة الآن"):
-                st.session_state.db["shifts"].append({
-                    "staff": staff["name"],
-                    "department": department,
-                    "start": datetime.now().strftime("%H:%M"),
-                    "end": None,
-                    "status": "نشط"
-                })
-                st.session_state.db["audit_logs"].append(
-                    f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — بدأ {staff["name"]} مناوبة جديدة في قسم {department}'
-                )
-                st.success("تم تسجيل بدء المناوبة بنجاح!")
-                st.rerun()
-
-
-# =========================================================
-# 3. PATIENT PORTAL (بوابة المريض / المرافِق)
-# =========================================================
-
-elif current_role == "مريض":
-    st.markdown('<div class="section-title">🧑‍🦽 بوابة المريض والمرافق للخدمات الذاتية</div>', unsafe_allow_html=True)
-
-    all_patients = []
-    for d_name, p_list in st.session_state.db["departments"].items():
-        for p in p_list:
-            p_copy = p.copy()
-            p_copy["dept"] = d_name
-            all_patients.append(p_copy)
-
-    if not all_patients:
-        st.warning("لا يوجد مرضى منومين في النظام حالياً.")
-    else:
-        patient_names = [f'{p["name"]} (الغرفة {p["room"]} - {p["dept"]})' for p in all_patients]
-        selected_p_idx = st.selectbox("اختر اسم المريض لعرض الملف:", range(len(patient_names)), format_func=lambda x: patient_names[x])
-        
-        selected_patient = all_patients[selected_p_idx]
-
-        st.markdown(f"""
-        <div class="patient-card">
-            <h3>👤 الملف الطبي: {selected_patient["name"]}</h3>
-            <b>القسم:</b> {selected_patient["dept"]} | <b>الغرفة:</b> {selected_patient["room"]} | <b>السرير:</b> {selected_patient["bed"]}<br>
-            <b>العمر:</b> {selected_patient["age"]} سنة | <b>الجنس:</b> {selected_patient["gender"]}<br>
-            <b>التشخيص:</b> {selected_patient["diagnosis"]}
+if "started" not in st.session_state:
+    st.session_state.started = False
+
+if not st.session_state.started:
+    col1, col2, col3 = st.columns([1, 10, 1])
+    with col2:
+        st.markdown("""
+        <div class="welcome-card">
+            <div class="bismillah">بسم الله الرحمن الرحيم</div>
+            <div class="welcome-title">مرحباً بك عزيزي المستفيد في برنامج رفيقي 🩺</div>
+            <p style="font-size: 1.15rem; line-height: 1.9;">
+                برنامج <b>رفيقي</b> هو تطبيق ويب مطور من قبل المبرمج <span class="developer-tag">راشد الحارثي / Rashed AlHarthi</span>.
+            </p>
+            <p style="font-size: 1.08rem; line-height: 1.9;">
+                وهو تطبيق يهدف إلى تطوير وتحسين عمل الورديات في أقسام التنويم وتقليل الأخطاء التي تحصل بشكل شبه يومي من الطاقم الطبي، بحيث يتم تنظيم معلومات المريض بدقة عالية، إضافة إلى وجود صفحة خاصة للمريض بإمكانيته أن يطلع فيها على حالته الصحية ويحصل على تنبيه بوقت الدواء وجرعته وغيرها من الخدمات الصحية المتقدمة.
+            </p>
         </div>
         """, unsafe_allow_html=True)
 
-        p_tabs = st.tabs(["❤️ العلامات الحيوية الأخيرة", "💊 جدول الأدوية", "🩺 الخطة العلاجية والتوصيات"])
+        if st.button("🚀 ابدأ الآن", use_container_width=True, type="primary"):
+            st.session_state.started = True
+            st.rerun()
 
-        with p_tabs[0]:
-            v = selected_patient["vitals"]
+# =========================================================
+# 6. MAIN APPLICATION CODE (RUNS AFTER "START NOW")
+# =========================================================
+
+else:
+    # Header reset button in sidebar
+    if st.sidebar.button("🏠 الشاشة الترحيبية"):
+        st.session_state.started = False
+        st.rerun()
+
+    st.markdown("""
+    <div class="main-header">
+        <h1>🏥 نظام رفيقي للرعاية الصحية</h1>
+        <p>Rafiqi Healthcare & Nursing Management System</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    user_role = st.radio(
+        "بوابة المستخدم / User Portal",
+        [
+            "👨‍💼 Supervisor / المشرف",
+            "👩‍⚕️ Medical Staff / الطاقم الطبي",
+            "🧑‍🦽 Patient / المريض"
+        ],
+        horizontal=True
+    )
+
+    if "Supervisor" in user_role:
+        current_role = "Supervisor"
+    elif "Medical Staff" in user_role:
+        current_role = "Medical Staff"
+    else:
+        current_role = "Patient"
+
+    st.sidebar.title("🏥 رفيقي / Rafiqi")
+    st.sidebar.caption(f"الدور الحالي: {current_role}")
+
+    # -----------------------------------------------------
+    # SUPERVISOR PORTAL
+    # -----------------------------------------------------
+    if current_role == "Supervisor":
+        st.sidebar.subheader("إدارة المشرف")
+
+        supervisor_page = st.sidebar.radio(
+            "القائمة",
+            [
+                "📊 Overview",
+                "🔄 Shift Handover",
+                "🚪 Permission Requests",
+                "👥 Staff",
+                "🏥 Departments",
+                "📜 Audit Log"
+            ]
+        )
+
+        if supervisor_page == "📊 Overview":
+            st.markdown('<div class="section-title">👨‍💼 Supervisor Overview</div>', unsafe_allow_html=True)
+
+            total_patients = sum(len(p) for p in st.session_state.db["departments"].values())
+            active_shifts = len([s for s in st.session_state.db["shifts"] if s["status"] == "Active"])
+            pending_permissions = len([p for p in st.session_state.db["permissions"] if p["status"] == "Pending"])
+
             c1, c2, c3, c4 = st.columns(4)
-            c1.metric("ضغط الدم", v["BP"])
-            c2.metric("نبض القلب", v["HR"])
-            c3.metric("الحرارة", f'{v["Temp"]}°C')
-            c4.metric("نسبة الأكسجين", f'{v["SpO2"]}%')
+            with c1:
+                st.metric("Total Patients", total_patients)
+            with c2:
+                st.metric("Active Shifts", active_shifts)
+            with c3:
+                st.metric("Permission Requests", pending_permissions)
+            with c4:
+                st.metric("Departments", len(st.session_state.db["departments"]))
 
-        with p_tabs[1]:
-            if not selected_patient["medications"]:
-                st.info("لا توجد أدوية مسجلة حالياً.")
-            else:
-                for m in selected_patient["medications"]:
-                    st.write(f'💊 **{m["name"]}** — الجرعة: {m["dose"]} ({m["time"]}) — حالة الدواء: **{m["status"]}**')
+            st.markdown('<div class="section-title">🔄 Current Shift Status</div>', unsafe_allow_html=True)
 
-        with p_tabs[2]:
-            if not selected_patient["care_plan"]:
-                st.info("لا توجد خطة مدونة حالياً.")
+            if not st.session_state.db["shifts"]:
+                st.info("No shift records yet.")
             else:
-                for plan in selected_patient["care_plan"]:
-                    st.markdown(f"- {plan}")
+                for shift in reversed(st.session_state.db["shifts"]):
+                    if shift["status"] == "Active":
+                        st.success(f'🟢 {shift["staff"]} — {shift["department"]} — Shift started at {shift["start"]}')
+                    else:
+                        st.info(f'⚪ {shift["staff"]} — {shift["department"]} — Completed')
+
+        elif supervisor_page == "🔄 Shift Handover":
+            st.markdown('<div class="section-title">🔄 Shift Handover Monitoring</div>', unsafe_allow_html=True)
+
+            if not st.session_state.db["handovers"]:
+                st.info("No handover records available.")
+            else:
+                for h in reversed(st.session_state.db["handovers"]):
+                    with st.expander(f'{h["department"]} — {h["from_staff"]} → {h["to_staff"]}'):
+                        st.write(f'**Date:** {h["date"]}')
+                        st.write(f'**Patient:** {h["patient"]}')
+                        st.write(f'**Handover Notes:** {h["notes"]}')
+                        st.write(f'**Pending Tasks:** {h["pending_tasks"]}')
+
+        elif supervisor_page == "🚪 Permission Requests":
+            st.markdown('<div class="section-title">🚪 Permission Requests</div>', unsafe_allow_html=True)
+
+            requests = st.session_state.db["permissions"]
+
+            if not requests:
+                st.info("No permission requests.")
+
+            for i, request in enumerate(requests):
+                with st.container():
+                    st.markdown(
+                        f"""
+                        <div class="permission-box">
+                            <b>{request["staff"]}</b><br>
+                            Department: {request["department"]}<br>
+                            Time: {request["from"]} → {request["to"]}<br>
+                            Reason: {request["reason"]}<br>
+                            Status: <b>{request["status"]}</b>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                    if request["status"] == "Pending":
+                        a, b = st.columns(2)
+                        with a:
+                            if st.button("✅ Approve", key=f"approve_{i}"):
+                                request["status"] = "Approved"
+                                st.session_state.db["audit_logs"].append(
+                                    f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — Supervisor approved permission for {request["staff"]}'
+                                )
+                                st.rerun()
+                        with b:
+                            if st.button("❌ Reject", key=f"reject_{i}"):
+                                request["status"] = "Rejected"
+                                st.session_state.db["audit_logs"].append(
+                                    f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — Supervisor rejected permission for {request["staff"]}'
+                                )
+                                st.rerun()
+
+        elif supervisor_page == "👥 Staff":
+            st.markdown('<div class="section-title">👥 Staff Management</div>', unsafe_allow_html=True)
+
+            for user in st.session_state.db["users"]:
+                st.markdown(
+                    f"""
+                    <div class="patient-card">
+                        <div class="patient-name">👤 {user["name"]}</div>
+                        <div class="small-text">
+                            Role: {user["role"]}<br>
+                            Department: {user["department"]}
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+            st.subheader("➕ Add Staff")
+
+            with st.form("add_staff"):
+                name = st.text_input("Name")
+                role = st.selectbox("Role", ["Medical Staff", "Supervisor"])
+                department = st.selectbox(
+                    "Department",
+                    list(st.session_state.db["departments"].keys()) + ["All"]
+                )
+                submit = st.form_submit_button("Add Staff")
+
+                if submit and name.strip():
+                    new_id = len(st.session_state.db["users"]) + 1
+                    st.session_state.db["users"].append({
+                        "id": new_id,
+                        "name": name,
+                        "role": role,
+                        "department": department
+                    })
+                    st.success("Staff member added successfully.")
+                    st.rerun()
+
+        elif supervisor_page == "🏥 Departments":
+            st.markdown('<div class="section-title">🏥 Departments Overview</div>', unsafe_allow_html=True)
+
+            for dept_name, patients_list in st.session_state.db["departments"].items():
+                theme = DEPARTMENT_THEMES[dept_name]
+                st.markdown(
+                    f"""
+                    <div style="
+                        background:{theme["light"]};
+                        border-right:6px solid {theme["color"]};
+                        padding:16px;
+                        border-radius:12px;
+                        margin-bottom:10px;
+                    ">
+                        <b>{theme["icon"]} {dept_name}</b><br>
+                        Total Patients: {len(patients_list)}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+        elif supervisor_page == "📜 Audit Log":
+            st.markdown('<div class="section-title">📜 Audit Log</div>', unsafe_allow_html=True)
+
+            logs = st.session_state.db["audit_logs"]
+            if not logs:
+                st.info("No activity recorded.")
+            else:
+                for log in reversed(logs):
+                    st.code(log)
+
+    # -----------------------------------------------------
+    # MEDICAL STAFF PORTAL
+    # -----------------------------------------------------
+    elif current_role == "Medical Staff":
+
+        staff = st.session_state.db["users"][0]
+
+        st.sidebar.subheader("الطاقم الطبي")
+
+        department = st.sidebar.selectbox(
+            "🏥 القسم / Department",
+            list(st.session_state.db["departments"].keys()),
+            index=0
+        )
+
+        theme = DEPARTMENT_THEMES[department]
+
+        st.markdown(
+            f"""
+            <div style="
+                background:{theme["light"]};
+                border-right:7px solid {theme["color"]};
+                padding:20px;
+                border-radius:15px;
+                margin-bottom:20px;
+            ">
+                <h2 style="color:{theme["color"]}; margin:0;">
+                    {theme["icon"]} {department}
+                </h2>
+                <span>Medical Staff Portal</span>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        staff_menu = st.sidebar.radio(
+            "القائمة",
+            [
+                "📊 Department Dashboard",
+                "👥 Patients",
+                "➕ Add Patient",
+                "🔄 Handover",
+                "🚪 Permission",
+                "🕐 My Shift"
+            ]
+        )
+
+        patients = st.session_state.db["departments"][department]
+
+        if staff_menu == "📊 Department Dashboard":
+            total = len(patients)
+            critical = len([p for p in patients if p["status"] == "Critical"])
+            warning = len([p for p in patients if p["status"] == "Warning"])
+            stable = len([p for p in patients if p["status"] == "Stable"])
+
+            a, b, c, d = st.columns(4)
+            a.metric("Patients", total)
+            b.metric("🔴 Critical", critical)
+            c.metric("🟠 Warning", warning)
+            d.metric("🟢 Stable", stable)
+
+            st.markdown('<div class="section-title">🚨 Alerts</div>', unsafe_allow_html=True)
+
+            alerts = False
+            for p in patients:
+                if p["vitals"]["SpO2"] < 92:
+                    alerts = True
+                    st.markdown(
+                        f"""
+                        <div class="alert-danger">
+                            ⚠️ <b>{p["name"]}</b> — SpO₂ {p["vitals"]["SpO2"]}%
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+                if p["vitals"]["Temp"] >= 38.0:
+                    alerts = True
+                    st.markdown(
+                        f"""
+                        <div class="alert-warning">
+                            🌡️️ <b>{p["name"]}</b> — Temperature {p["vitals"]["Temp"]}°C
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+            if not alerts:
+                st.success("✅ No automatic alerts.")
+
+        elif staff_menu == "👥 Patients":
+            st.markdown('<div class="section-title">👥 Patients</div>', unsafe_allow_html=True)
+
+            search = st.text_input("🔎 Search", placeholder="Patient name, room...")
+
+            if not patients:
+                st.info(f"No patients registered in {department} department.")
+
+            for p_idx, p in enumerate(patients):
+                if search.lower() not in (p["name"] + str(p["room"])).lower():
+                    continue
+
+                with st.expander(f'👤 {p["name"]} — Room {p["room"]} / Bed {p["bed"]} ({p["status"]})'):
+                    st.write(f'**Diagnosis:** {p["diagnosis"]}')
+                    st.write(f'**Allergy:** {p["allergy"]}')
+                    st.write(f'**Isolation:** {p["isolation"]}')
+                    st.write(f'**Fall Risk:** {p["fall_risk"]}')
+
+                    tabs = st.tabs([
+                        "❤️ Vitals",
+                        "🧪 Labs",
+                        "💊 Medications",
+                        "📝 Notes",
+                        "🩺 Care Plan",
+                        "🔄 Handover"
+                    ])
+
+                    with tabs[0]:
+                        v = p["vitals"]
+                        a, b, c, d, e, f = st.columns(6)
+                        a.metric("BP", v["BP"])
+                        b.metric("HR", v["HR"])
+                        c.metric("RR", v["RR"])
+                        d.metric("Temp", f'{v["Temp"]}°C')
+                        e.metric("SpO₂", f'{v["SpO2"]}%')
+                        f.metric("Pain", f'{v["Pain"]}/10')
+
+                        st.markdown("---")
+                        st.write("**Update Vitals**")
+                        with st.form(f"update_vitals_{p['id']}"):
+                            v_bp = st.text_input("BP", value=v["BP"])
+                            v_hr = st.number_input("HR", value=v["HR"])
+                            v_rr = st.number_input("RR", value=v["RR"])
+                            v_temp = st.number_input("Temp (°C)", value=float(v["Temp"]), step=0.1)
+                            v_spo2 = st.number_input("SpO2 (%)", value=v["SpO2"])
+                            v_pain = st.number_input("Pain (0-10)", value=v["Pain"], min_value=0, max_value=10)
+
+                            if st.form_submit_button("Update Vitals"):
+                                p["vitals"] = {
+                                    "BP": v_bp, "HR": v_hr, "RR": v_rr,
+                                    "Temp": v_temp, "SpO2": v_spo2, "Pain": v_pain
+                                }
+                                st.session_state.db["audit_logs"].append(
+                                    f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — {staff["name"]} updated vitals for {p["name"]}'
+                                )
+                                st.success("Vitals updated successfully!")
+                                st.rerun()
+
+                    with tabs[1]:
+                        for lab in p["labs"]:
+                            if lab["flag"] == "High":
+                                st.error(f'🔴 {lab["test"]}: {lab["result"]} {lab["unit"]} (High)')
+                            elif lab["flag"] == "Low":
+                                st.warning(f'🟡 {lab["test"]}: {lab["result"]} {lab["unit"]} (Low)')
+                            else:
+                                st.success(f'🟢 {lab["test"]}: {lab["result"]} {lab["unit"]}')
+                            st.caption(f'Reference: {lab["reference"]}')
+
+                    with tabs[2]:
+                        for med_idx, med in enumerate(p["medications"]):
+                            st.markdown(f"**{med['name']}** — {med['dose']} • {med['route']} • {med['time']}")
+                            current_status = st.selectbox(
+                                "Administration Status",
+                                ["Pending", "Given", "Refused", "Omitted"],
+                                index=["Pending", "Given", "Refused", "Omitted"].index(med["status"]),
+                                key=f"med_status_{p['id']}_{med_idx}"
+                            )
+                            if current_status != med["status"]:
+                                med["status"] = current_status
+                                st.session_state.db["audit_logs"].append(
+                                    f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — {staff["name"]} set medication {med["name"]} for {p["name"]} to {current_status}'
+                                )
+                                st.rerun()
+
+                    with tabs[3]:
+                        for note in p["notes"]:
+                            st.write(f"⏱️ **{note['time']}** ({note['author']}): {note['text']}")
+
+                        with st.form(f"add_note_{p['id']}"):
+                            new_note_text = st.text_area("Add Nursing Note")
+                            if st.form_submit_button("Save Note") and new_note_text.strip():
+                                p["notes"].append({
+                                    "time": datetime.now().strftime("%H:%M"),
+                                    "author": staff["name"],
+                                    "text": new_note_text
+                                })
+                                st.success("Note saved.")
+                                st.rerun()
+
+                    with tabs[4]:
+                        for item in p["care_plan"]:
+                            st.markdown(f"- {item}")
+
+                    with tabs[5]:
+                        with st.form(f"patient_handover_{p['id']}"):
+                            to_staff = st.selectbox("Handover To", [u["name"] for u in st.session_state.db["users"] if u["name"] != staff["name"]], key=f"to_staff_{p['id']}")
+                            handover_notes = st.text_area("Handover Notes", key=f"h_notes_{p['id']}")
+                            pending_tasks = st.text_area("Pending Tasks", key=f"p_tasks_{p['id']}")
+
+                            if st.form_submit_button("Submit Handover"):
+                                st.session_state.db["handovers"].append({
+                                    "department": department,
+                                    "from_staff": staff["name"],
+                                    "to_staff": to_staff,
+                                    "patient": p["name"],
+                                    "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                                    "notes": handover_notes,
+                                    "pending_tasks": pending_tasks
+                                })
+                                st.success("Handover submitted successfully!")
+                                st.rerun()
+
+        elif staff_menu == "➕ Add Patient":
+            st.markdown('<div class="section-title">➕ Add New Patient</div>', unsafe_allow_html=True)
+
+            with st.form("add_patient_form"):
+                name = st.text_input("Patient Name")
+                age = st.number_input("Age", min_value=0, max_value=120, value=30)
+                gender = st.selectbox("Gender", ["Male", "Female"])
+                room = st.text_input("Room Number")
+                bed = st.text_input("Bed Letter", value="A")
+                diagnosis = st.text_input("Diagnosis")
+                status = st.selectbox("Status", ["Stable", "Warning", "Critical"])
+                allergy = st.text_input("Allergies", value="None")
+                isolation = st.selectbox("Isolation", ["Standard", "Contact", "Droplet", "Airborne"])
+                fall_risk = st.selectbox("Fall Risk", ["Low", "Medium", "High"])
+
+                if st.form_submit_button("Add Patient"):
+                    if name.strip() and room.strip():
+                        new_patient = {
+                            "id": 1000 + len(patients) + 1,
+                            "room": room,
+                            "bed": bed,
+                            "name": name,
+                            "age": age,
+                            "gender": gender,
+                            "diagnosis": diagnosis,
+                            "status": status,
+                            "allergy": allergy,
+                            "isolation": isolation,
+                            "fall_risk": fall_risk,
+                            "code_status": "Full Code",
+                            "vitals": {"BP": "120/80", "HR": 75, "RR": 16, "Temp": 37.0, "SpO2": 98, "Pain": 0},
+                            "labs": [],
+                            "medications": [],
+                            "notes": [],
+                            "care_plan": []
+                        }
+                        patients.append(new_patient)
+                        st.session_state.db["audit_logs"].append(
+                            f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — {staff["name"]} added patient {name} to {department}'
+                        )
+                        st.success(f"Patient {name} added to {department}!")
+                        st.rerun()
+                    else:
+                        st.error("Please fill in required fields (Name, Room).")
+
+        elif staff_menu == "🔄 Handover":
+            st.markdown('<div class="section-title">🔄 Shift Handover Record</div>', unsafe_allow_html=True)
+
+            with st.form("general_handover_form"):
+                to_staff = st.selectbox("Handover To", [u["name"] for u in st.session_state.db["users"] if u["name"] != staff["name"]])
+                patient_name = st.selectbox("Patient (Optional)", ["All Department Patients"] + [p["name"] for p in patients])
+                notes = st.text_area("Summary / Key Notes")
+                pending_tasks = st.text_area("Pending Tasks")
+
+                if st.form_submit_button("Submit Shift Handover"):
+                    st.session_state.db["handovers"].append({
+                        "department": department,
+                        "from_staff": staff["name"],
+                        "to_staff": to_staff,
+                        "patient": patient_name,
+                        "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                        "notes": notes,
+                        "pending_tasks": pending_tasks
+                    })
+                    st.success("Handover submitted.")
+                    st.rerun()
+
+        elif staff_menu == "🚪 Permission":
+            st.markdown('<div class="section-title">🚪 Request Shift Leave / Permission</div>', unsafe_allow_html=True)
+
+            with st.form("permission_form"):
+                time_from = st.time_input("From Time", value=time(12, 0))
+                time_to = st.time_input("To Time", value=time(13, 0))
+                reason = st.text_area("Reason for Permission")
+
+                if st.form_submit_button("Submit Request"):
+                    st.session_state.db["permissions"].append({
+                        "staff": staff["name"],
+                        "department": department,
+                        "from": time_from.strftime("%H:%M"),
+                        "to": time_to.strftime("%H:%M"),
+                        "reason": reason,
+                        "status": "Pending"
+                    })
+                    st.success("Permission request submitted to Supervisor!")
+                    st.rerun()
+
+        elif staff_menu == "🕐 My Shift":
+            st.markdown('<div class="section-title">🕐 Shift Clocking</div>', unsafe_allow_html=True)
+
+            user_active_shift = next((s for s in st.session_state.db["shifts"] if s["staff"] == staff["name"] and s["status"] == "Active"), None)
+
+            if user_active_shift:
+                st.success(f"🟢 Active Shift started at {user_active_shift['start']}")
+                if st.button("🔴 Clock Out"):
+                    user_active_shift["status"] = "Completed"
+                    user_active_shift["end"] = datetime.now().strftime("%H:%M")
+                    st.session_state.db["audit_logs"].append(
+                        f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — {staff["name"]} clocked out.'
+                    )
+                    st.success("Clocked out successfully.")
+                    st.rerun()
+            else:
+                st.info("⚪ No active shift found.")
+                if st.button("🟢 Clock In"):
+                    st.session_state.db["shifts"].append({
+                        "staff": staff["name"],
+                        "department": department,
+                        "start": datetime.now().strftime("%H:%M"),
+                        "end": None,
+                        "status": "Active"
+                    })
+                    st.session_state.db["audit_logs"].append(
+                        f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} — {staff["name"]} clocked in.'
+                    )
+                    st.success("Clocked in successfully.")
+                    st.rerun()
+
+    # -----------------------------------------------------
+    # PATIENT PORTAL
+    # -----------------------------------------------------
+    else:
+        st.markdown('<div class="section-title">🧑‍🦽 Patient Portal / بوابة المريض</div>', unsafe_allow_html=True)
+
+        all_patients = []
+        for dept, p_list in st.session_state.db["departments"].items():
+            for p in p_list:
+                p_copy = p.copy()
+                p_copy["department"] = dept
+                all_patients.append(p_copy)
+
+        if not all_patients:
+            st.info("No patient records found in the system.")
+        else:
+            selected_patient_name = st.selectbox("Select Your Profile / اختر اسم المريض", [p["name"] for p in all_patients])
+            patient_data = next(p for p in all_patients if p["name"] == selected_patient_name)
+
+            st.markdown(
+                f"""
+                <div class="patient-card">
+                    <div class="patient-name"> Welcome, {patient_data["name"]}</div>
+                    <div class="small-text">
+                        Department: {patient_data["department"]} | Room: {patient_data["room"]} - Bed {patient_data["bed"]}<br>
+                        Attending Diagnosis: {patient_data["diagnosis"]}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            p_tabs = st.tabs(["❤️ My Vitals", "💊 My Medications", "🩺 Care Plan"])
+
+            with p_tabs[0]:
+                v = patient_data["vitals"]
+                c1, c2, c3, c4 = st.columns(4)
+                c1.metric("Blood Pressure", v["BP"])
+                c2.metric("Heart Rate", f'{v["HR"]} bpm')
+                c3.metric("Temperature", f'{v["Temp"]}°C')
+                c4.metric("Oxygen Level (SpO₂)", f'{v["SpO2"]}%')
+
+            with p_tabs[1]:
+                if not patient_data["medications"]:
+                    st.info("No prescribed medications listed.")
+                else:
+                    for med in patient_data["medications"]:
+                        st.write(f"💊 **{med['name']}** ({med['dose']}) — Time: {med['time']} — Status: *{med['status']}*")
+
+            with p_tabs[2]:
+                if not patient_data["care_plan"]:
+                    st.info("No care plan records.")
+                else:
+                    for item in patient_data["care_plan"]:
+                        st.write(f"• {item}")
